@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foodie Haven</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal" role="dialog" aria-labelledby="loginTitle" aria-hidden="true">
+        <div class="modal-content">
+            <span class="close" aria-label="Close">×</span>
+            <h2 id="loginTitle">Login</h2>
+            <form id="loginForm">
+                <label for="username" class="sr-only">Username</label>
+                <input type="text" id="username" placeholder="Username" required>
+                <label for="password" class="sr-only">Password</label>
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+            <p>Not registered? <span id="registerLink" role="button" tabindex="0">Create an account</span></p>
+        </div>
+    </div>
+
+    <!-- Recipe Details Modal -->
+    <div id="recipeModal" class="modal" role="dialog" aria-labelledby="recipeTitle" aria-hidden="true">
+        <div class="modal-content recipe-modal-content">
+            <span class="close" aria-label="Close">×</span>
+            <h2 id="recipeTitle"></h2>
+            <img id="recipeImage" src="" alt="Recipe Image">
+            <p><strong>Category:</strong> <span id="recipeCategory"></span></p>
+            <h3>Ingredients</h3>
+            <ul id="recipeIngredients"></ul>
+            <h3>Instructions</h3>
+            <p id="recipeInstructions"></p>
+            <a id="recipeVideo" href="#" target="_blank" rel="noopener">Watch Tutorial</a>
+            <button id="favoriteBtn" class="favorite-btn">Add to Favorites</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <header>
+        <nav>
+            <h1 id="logo">Foodie Haven</h1>
+            <div id="userControls">
+                <button id="loginBtn" aria-label="Open login modal">Login</button>
+                <button id="logoutBtn" style="display: none;" aria-label="Logout">Logout</button>
+                <button id="favoritesBtn" style="display: none;" aria-label="View Favorites">Favorites</button>
+                <button id="themeToggle" aria-label="Toggle theme">🌙</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>Welcome, Food Lovers!</h2>
+            <p>Discover culinary delights crafted by the world’s finest chefs.</p>
+            <div class="search-container">
+                <label for="searchInput" class="sr-only">Search for food</label>
+                <input type="text" id="searchInput" placeholder="Search meals (e.g., pizza) or categories (e.g., dessert)">
+                <button id="searchBtn" aria-label="Search">Search</button>
+            </div>
+        </section>
+
+        <section id="foodContainer" class="food-grid" aria-live="polite">
+            <!-- Food items will be dynamically added here -->
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Foodie Haven. All rights reserved.</p>
+        <p>Powered by <a href="http://www.themealdb.com" target="_blank" rel="noopener">TheMealDB</a></p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
