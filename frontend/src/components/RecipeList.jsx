@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
+import axios from '../config/api.js';
 import SearchBar from './SearchBar.jsx';
 import RecipeDetailsModal from './RecipeDetailsModal.jsx';
 import { useFavorites } from '../context/FavoritesContext.jsx';
@@ -27,7 +27,7 @@ export default function RecipeList({ showFavoritesOnly = false }) {
           : `${MEALDB_URL}${encodeURIComponent(search.query)}`;
         const [mealDbRes, userRes] = await Promise.all([
           fetch(mealUrl).then((r) => r.json()),
-          axios.get('/api/recipes').then((r) => r.data),
+          axios.get('api/recipes').then((r) => r.data),
         ]);
         const mealsArray = Array.isArray(mealDbRes.meals) ? mealDbRes.meals : [];
         const mealDb = mealsArray.map((m) => ({

@@ -6,7 +6,17 @@ const mongoose = require('mongoose');
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+// CORS configuration for production
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? [process.env.FRONTEND_URL, 'https://your-vercel-app.vercel.app'] // Replace with your actual Vercel URL
+    : ['http://localhost:3000', 'http://localhost:5173'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Health endpoint

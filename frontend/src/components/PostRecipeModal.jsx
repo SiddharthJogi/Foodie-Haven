@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import axios from '../config/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
 export default function PostRecipeModal({ open, onClose }) {
@@ -25,7 +25,7 @@ export default function PostRecipeModal({ open, onClose }) {
         .split(',')
         .map((s) => s.trim())
         .filter(Boolean);
-      await axios.post('/api/recipes', {
+      await axios.post('api/recipes', {
         strMeal: form.strMeal,
         strMealThumb: form.strMealThumb,
         strCategory: form.strCategory,

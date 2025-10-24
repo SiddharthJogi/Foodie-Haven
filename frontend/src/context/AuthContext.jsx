@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
+import axios from '../config/api.js';
 
 const AuthContext = createContext(null);
 
@@ -25,12 +25,12 @@ export function AuthProvider({ children }) {
   }, [token]);
 
   const login = async (username, password, isRegister = false) => {
-    const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login';
+    const endpoint = isRegister ? 'api/auth/register' : 'api/auth/login';
     const payload = { username, password };
     const res = await axios.post(endpoint, payload);
     if (isRegister) {
       // After register, immediately log in
-      const loginRes = await axios.post('/api/auth/login', payload);
+      const loginRes = await axios.post('api/auth/login', payload);
       const data = loginRes.data;
       setUser(data.user);
       setToken(data.token);
