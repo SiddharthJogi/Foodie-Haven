@@ -10,7 +10,7 @@ const app = express();
 // CORS configuration for production
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? [process.env.FRONTEND_URL, 'https://your-vercel-app.vercel.app'] // Replace with your actual Vercel URL
+    ? [process.env.FRONTEND_URL, 'https://foodie-haven-frontend.vercel.app']
     : ['http://localhost:3000', 'http://localhost:5173'],
   credentials: true,
   optionsSuccessStatus: 200
