@@ -1,6 +1,12 @@
+import { useState } from 'react';
 import { useFavorites } from '../context/FavoritesContext.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
+import RecipeChat from './RecipeChat.jsx';
 
 export default function RecipeDetailsModal({ open, onClose, recipe }) {
+  const [showChat, setShowChat] = useState(false);
+  const { user } = useAuth();
+  
   if (!open || !recipe) return null;
 
   const hasVideo = !!recipe.strYoutube;
@@ -38,16 +44,33 @@ export default function RecipeDetailsModal({ open, onClose, recipe }) {
             Watch Tutorial
           </a>
         )}
-        <div className="mt-5 flex justify-end">
-          <button
-            onClick={() => toggleFavorite(recipe)}
-            className="px-4 py-2 rounded-full text-white"
-            style={{ backgroundColor: isFavorite(recipe) ? '#ff9800' : 'var(--color-primary)' }}
-          >
-            {isFavorite(recipe) ? '★ Remove from Favorites' : '☆ Add to Favorites'}
-          </button>
+        <div className="mt-5 flex justify-between">
+          <div className="flex space-x-2">
+            <button
+              onClick={() => toggleFavorite(recipe)}
+              className="px-4 py-2 rounded-full text-white"
+              style={{ backgroundColor: isFavorite(recipe) ? '#ff9800' : 'var(--color-primary)' }}
+            >
+              {isFavorite(recipe) ? '★ Remove from Favorites' : '☆ Add to Favorites'}
+            </button>
+            {user && (
+              <button
+                onClick={() => setShowChat(true)}
+                className="px-4 py-2 rounded-full text-white bg-green-500 hover:bg-green-600"
+              >
+                💬 Live Chat
+              </button>
+            )}
+          </div>
         </div>
       </div>
+      
+      {/* Chat Modal */}
+      <RecipeChat 
+        recipe={recipe} 
+        isOpen={showChat} 
+        onClose={() => setShowChat(false)} 
+      />
     </div>
   );
 }

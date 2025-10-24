@@ -2,7 +2,7 @@ import { useState } from 'react';
 import axios from '../config/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
-export default function PostRecipeModal({ open, onClose }) {
+export default function PostRecipeModal({ open, onClose, onRecipePosted }) {
   const { user } = useAuth();
   const [form, setForm] = useState({
     strMeal: '',
@@ -32,7 +32,23 @@ export default function PostRecipeModal({ open, onClose }) {
         strInstructions: form.strInstructions,
         ingredients,
       });
+      
+      // Reset form
+      setForm({
+        strMeal: '',
+        strMealThumb: '',
+        strCategory: '',
+        strInstructions: '',
+        ingredientsRaw: '',
+      });
+      
       onClose();
+      
+      // Trigger refresh of recipe list
+      if (onRecipePosted) {
+        onRecipePosted();
+      }
+      
       alert('Recipe posted!');
     } catch (err) {
       setError(err?.response?.data?.message || 'Failed to post recipe');

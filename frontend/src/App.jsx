@@ -12,19 +12,29 @@ function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [showPost, setShowPost] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
+  const [refreshRecipes, setRefreshRecipes] = useState(null);
 
   return (
     <ThemeProvider>
       <div className="min-h-screen" style={{ backgroundColor: '#fff8e1' }}>
-        <Header onLogin={() => setShowLogin(true)} onPost={() => setShowPost(true)} onShowFavorites={() => setShowFavorites((v) => !v)} />
+        <Header 
+          onLogin={() => setShowLogin(true)} 
+          onPost={() => setShowPost(true)} 
+          onShowFavorites={() => setShowFavorites((v) => !v)}
+          showFavorites={showFavorites}
+        />
         <main className="max-w-6xl mx-auto p-4">
           <Routes>
-            <Route path="/" element={<RecipeList showFavoritesOnly={showFavorites} />} />
+            <Route path="/" element={<RecipeList showFavoritesOnly={showFavorites} onRefresh={setRefreshRecipes} />} />
             <Route path="/auth" element={<AuthPage />} />
           </Routes>
         </main>
         <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />
-        <PostRecipeModal open={showPost} onClose={() => setShowPost(false)} />
+        <PostRecipeModal 
+          open={showPost} 
+          onClose={() => setShowPost(false)} 
+          onRecipePosted={refreshRecipes}
+        />
       </div>
     </ThemeProvider>
   );

@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
+const { createServer } = require('http');
+const { Server } = require('socket.io');
 
 dotenv.config();
 
@@ -34,19 +36,108 @@ app.use('/api/favorites', favoriteRoutes);
 
 const PORT = process.env.PORT || 5000;
 
+// Create HTTP server
+const server = createServer(app);
+
+// Initialize Socket.IO with CORS
+const io = new Server(server, {
+  cors: {
+    origin: process.env.NODE_ENV === 'production' 
+      ? [process.env.FRONTEND_URL, 'https://foodie-haven-frontend.vercel.app']
+      : ['http://localhost:3000', 'http://localhost:5173'],
+    methods: ['GET', 'POST'],
+    credentials: true,
+    allowedHeaders: ['*']
+  },
+  allowEIO3: true
+});
+
+// Import Chat model
+const Chat = require('./models/Chat');
+const User = require('./models/User');
+
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+  // Join recipe room
+  socket.on('join-recipe', async (data) => {
+    const { recipeId, recipeType } = data;
+    const room = `${recipeType}-${recipeId}`;
+    socket.join(room);
+    
+    // Send last 10 messages to the user
+    try {
+      const chat = await Chat.findOne({ recipeId, recipeType });
+      if (chat) {
+        socket.emit('chat-history', chat.messages);
+      } else {
+        socket.emit('chat-history', []);
+      }
+    } catch (error) {
+      // Error handling
+    }
+  });
+
+  // Handle new messages
+  socket.on('send-message', async (data) => {
+    if (!data.userId) {
+      return;
+    }
+    
+    const { recipeId, recipeType, message, userId, username } = data;
+    const room = `${recipeType}-${recipeId}`;
+    
+    try {
+      // Find or create chat
+      let chat = await Chat.findOne({ recipeId, recipeType });
+      if (!chat) {
+        chat = new Chat({ recipeId, recipeType, messages: [] });
+      }
+      
+      // Add new message
+      chat.messages.push({
+        user: userId,
+        username,
+        message,
+        timestamp: new Date()
+      });
+      
+      // Keep only last 10 messages
+      if (chat.messages.length > 10) {
+        chat.messages = chat.messages.slice(-10);
+      }
+      
+      await chat.save();
+      
+      // Broadcast to all users in the room
+      io.to(room).emit('new-message', {
+        user: userId,
+        username,
+        message,
+        timestamp: new Date()
+      });
+    } catch (error) {
+      // Error handling
+    }
+  });
+
+  socket.on('disconnect', () => {
+    // User disconnected
+  });
+});
+
 async function start() {
   try {
     const mongoUri = process.env.MONGO_URI;
     if (!mongoUri) {
-      console.warn('MONGO_URI missing in .env. Server will start without DB connection.');
+      // MONGO_URI missing in .env. Server will start without DB connection.
     } else {
       await mongoose.connect(mongoUri);
-      console.log('MongoDB connected');
     }
 
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    server.listen(PORT, () => {
+      // Server running
+    });
   } catch (err) {
-    console.error('Failed to start server', err);
     process.exit(1);
   }
 }

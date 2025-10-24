@@ -1,9 +1,11 @@
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
+import { useLocation } from 'react-router-dom';
 
-export default function Header({ onLogin, onPost, onShowFavorites }) {
+export default function Header({ onLogin, onPost, onShowFavorites, showFavorites }) {
   const { user, logout } = useAuth();
   const { theme, toggle } = useTheme();
+  const location = useLocation();
   return (
     <header className="sticky top-0 z-50" style={{ backgroundColor: 'var(--color-primary)' }}>
       <div className="max-w-6xl mx-auto flex items-center justify-between p-4">
@@ -20,19 +22,26 @@ export default function Header({ onLogin, onPost, onShowFavorites }) {
           {user && (
             <button
               onClick={onShowFavorites}
-              className="px-4 py-2 rounded-full text-black border"
-              style={{ backgroundColor: 'var(--color-accent)' }}
+              className={`px-4 py-2 rounded-full text-black border transition-all duration-200 ${
+                showFavorites 
+                  ? 'ring-2 ring-white ring-opacity-50 scale-105 shadow-lg' 
+                  : 'hover:scale-105 hover:shadow-md'
+              }`}
+              style={{ 
+                backgroundColor: showFavorites ? 'var(--color-accent)' : 'var(--color-accent)',
+                opacity: showFavorites ? 1 : 0.8
+              }}
             >
-              Favorites
+              ⭐ Favorites
             </button>
           )}
           {user && (
             <button
               onClick={onPost}
-              className="px-4 py-2 rounded-full text-white border"
-              style={{ backgroundColor: '#e63900' }}
+              className="px-4 py-2 rounded-full text-white border transition-all duration-200 hover:scale-105 hover:shadow-lg"
+              style={{ backgroundColor: 'var(--color-primary)' }}
             >
-              Post Recipe
+              ➕ Post Recipe
             </button>
           )}
           {!user ? (

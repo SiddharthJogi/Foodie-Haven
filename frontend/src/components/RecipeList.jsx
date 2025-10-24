@@ -6,7 +6,7 @@ import { useFavorites } from '../context/FavoritesContext.jsx';
 
 const MEALDB_URL = 'https://www.themealdb.com/api/json/v1/1/search.php?s=';
 
-export default function RecipeList({ showFavoritesOnly = false }) {
+export default function RecipeList({ showFavoritesOnly = false, onRefresh }) {
   const [mealDbRecipes, setMealDbRecipes] = useState([]);
   const [userRecipes, setUserRecipes] = useState([]);
   const [filter, setFilter] = useState('all'); // all | user | mealdb
@@ -15,6 +15,45 @@ export default function RecipeList({ showFavoritesOnly = false }) {
   const [search, setSearch] = useState({ query: 'chicken', isCategory: false });
   const [selected, setSelected] = useState(null);
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
+
+  // Function to refresh recipes
+  const refreshRecipes = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const mealUrl = search.isCategory
+        ? `https://www.themealdb.com/api/json/v1/1/filter.php?c=${encodeURIComponent(search.query)}`
+        : `${MEALDB_URL}${encodeURIComponent(search.query)}`;
+      const [mealDbRes, userRes] = await Promise.all([
+        fetch(mealUrl).then((r) => r.json()),
+        axios.get('api/recipes').then((r) => r.data),
+      ]);
+      const mealsArray = Array.isArray(mealDbRes.meals) ? mealDbRes.meals : [];
+      const mealDb = mealsArray.map((m) => ({
+        mealId: m.idMeal,
+        strMeal: m.strMeal,
+        strMealThumb: m.strMealThumb,
+        strCategory: m.strCategory || (search.isCategory ? search.query : undefined),
+        strInstructions: m.strInstructions,
+        ingredients: [],
+        postedBy: null,
+        postType: 'MealDB',
+      }));
+      setMealDbRecipes(mealDb);
+      setUserRecipes(userRes || []);
+    } catch (err) {
+      setError('Failed to load recipes');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Expose refresh function to parent
+  useEffect(() => {
+    if (onRefresh) {
+      onRefresh(refreshRecipes);
+    }
+  }, [onRefresh]);
 
   useEffect(() => {
     let isMounted = true;
@@ -100,9 +139,36 @@ export default function RecipeList({ showFavoritesOnly = false }) {
     <section>
       <SearchBar onSearch={setSearch} />
       <div className="flex items-center gap-2 mb-6 justify-center">
-        <button onClick={() => setFilter('all')} className={`px-4 py-2 rounded-full border ${filter==='all' ? 'bg-gray-100' : 'bg-white'}`}>All Posts</button>
-        <button onClick={() => setFilter('user')} className={`px-4 py-2 rounded-full border ${filter==='user' ? 'bg-gray-100' : 'bg-white'}`}>User Posts</button>
-        <button onClick={() => setFilter('mealdb')} className={`px-4 py-2 rounded-full border ${filter==='mealdb' ? 'bg-gray-100' : 'bg-white'}`}>Website Posts</button>
+        <button 
+          onClick={() => setFilter('all')} 
+          className={`px-6 py-3 rounded-full border-2 transition-all duration-200 font-medium ${
+            filter === 'all' 
+              ? 'bg-blue-500 text-white border-blue-500 shadow-lg scale-105' 
+              : 'bg-white text-gray-700 border-gray-300 hover:border-blue-300 hover:scale-105'
+          }`}
+        >
+          🌟 All Posts
+        </button>
+        <button 
+          onClick={() => setFilter('user')} 
+          className={`px-6 py-3 rounded-full border-2 transition-all duration-200 font-medium ${
+            filter === 'user' 
+              ? 'bg-green-500 text-white border-green-500 shadow-lg scale-105' 
+              : 'bg-white text-gray-700 border-gray-300 hover:border-green-300 hover:scale-105'
+          }`}
+        >
+          👤 User Posts
+        </button>
+        <button 
+          onClick={() => setFilter('mealdb')} 
+          className={`px-6 py-3 rounded-full border-2 transition-all duration-200 font-medium ${
+            filter === 'mealdb' 
+              ? 'bg-purple-500 text-white border-purple-500 shadow-lg scale-105' 
+              : 'bg-white text-gray-700 border-gray-300 hover:border-purple-300 hover:scale-105'
+          }`}
+        >
+          🌐 Website Posts
+        </button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {visible.map((r) => (
