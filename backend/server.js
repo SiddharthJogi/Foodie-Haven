@@ -125,19 +125,38 @@ io.on('connection', (socket) => {
   });
 });
 
+// MongoDB connection event handlers
+mongoose.connection.on('connected', () => {
+  console.log('✅ MongoDB connected successfully!');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('❌ MongoDB connection error:', err.message);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('⚠️  MongoDB disconnected');
+});
+
 async function start() {
   try {
     const mongoUri = process.env.MONGO_URI;
     if (!mongoUri) {
-      // MONGO_URI missing in .env. Server will start without DB connection.
+      console.error('❌ MONGO_URI missing in .env file. Server will start without DB connection.');
+      console.log('⚠️  Please add MONGO_URI to your .env file');
     } else {
+      console.log('🔄 Connecting to MongoDB...');
+      console.log('📍 Connection string:', mongoUri.replace(/\/\/.*@/, '//***:***@')); // Hide credentials in logs
       await mongoose.connect(mongoUri);
     }
 
     server.listen(PORT, () => {
-      // Server running
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
     });
   } catch (err) {
+    console.error('❌ Failed to start server:', err.message);
+    console.error('Full error:', err);
     process.exit(1);
   }
 }

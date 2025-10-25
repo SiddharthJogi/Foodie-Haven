@@ -1,15 +1,33 @@
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
-import { useLocation } from 'react-router-dom';
+import { useFavorites } from '../context/FavoritesContext.jsx';
+import {  useNavigate } from 'react-router-dom';
 
 export default function Header({ onLogin, onPost, onShowFavorites, showFavorites }) {
   const { user, logout } = useAuth();
   const { theme, toggle } = useTheme();
-  const location = useLocation();
+  const { favoriteCount } = useFavorites();
+  
+  const navigate = useNavigate();
+
+  const handleHomeClick = () => {
+    // Reset favorites view and navigate to home
+    if (showFavorites) {
+      onShowFavorites(); // Toggle off favorites
+    }
+    navigate('/');
+  };
+
   return (
     <header className="sticky top-0 z-50" style={{ backgroundColor: 'var(--color-primary)' }}>
       <div className="max-w-6xl mx-auto flex items-center justify-between p-4">
-        <div className="text-3xl font-extrabold text-white">Foodie Haven</div>
+        <div 
+          className="text-3xl font-extrabold text-white cursor-pointer hover:opacity-80 transition-opacity duration-200"
+          onClick={handleHomeClick}
+          title="Go to Home"
+        >
+          Foodie Haven
+        </div>
         <div className="flex items-center gap-2">
           <button
             onClick={toggle}
@@ -32,7 +50,7 @@ export default function Header({ onLogin, onPost, onShowFavorites, showFavorites
                 opacity: showFavorites ? 1 : 0.8
               }}
             >
-              ⭐ Favorites
+              ⭐ Favorites {favoriteCount > 0 && `(${favoriteCount})`}
             </button>
           )}
           {user && (

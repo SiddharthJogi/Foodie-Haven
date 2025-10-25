@@ -7,9 +7,17 @@ const router = express.Router();
 
 // GET /api/favorites - list current user's favorites
 router.get('/', auth, async (req, res) => {
-  const user = req.userId;
-  const favs = await Favorite.find({ user }).lean();
-  return res.json(favs);
+  try {
+    const user = req.userId;
+    console.log('Fetching favorites for user ID:', user);
+    const favs = await Favorite.find({ user }).lean();
+    console.log('Found favorites:', favs.length);
+    console.log('Favorites data:', favs);
+    return res.json(favs);
+  } catch (error) {
+    console.error('Error fetching favorites:', error);
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
 });
 
 // POST /api/favorites - add a favorite

@@ -16,7 +16,7 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen" style={{ backgroundColor: '#fff8e1' }}>
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--color-background)' }}>
         <Header 
           onLogin={() => setShowLogin(true)} 
           onPost={() => setShowPost(true)} 
